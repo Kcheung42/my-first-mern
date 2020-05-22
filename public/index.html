@@ -5,18 +5,56 @@
     <title>My Mern Stack</title>
     <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- <script src="https://unpkg.com/react@16.7.0/umd/react.production.min.js"></script>
+         <script src="https://unpkg.com/react-dom@16.7.0/umd/react-dom.production.min.js"></script> -->
+
+
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
     <style>
-     .contents {
+     .hello {
        color: blue;
      }
     </style>
   </head>
   <body>
     <div id="contents"> </div>
-    <script>
-     const element = React.createElement('div', { title: 'Outer div'},
-                                         React.createElement('h1', {className: 'contents'}, 'Hello World'));
+    <script type="text/babel">
+     const element = (
+       <div title='Outer div'>
+       <h1 className="hello">Hello World!</h1>
+       </div>
+     )
      ReactDOM.render(element, document.getElementById('contents'));
     </script>
   </body>
 </html>
+
+
+<!--
+     1. remove type="text/babel" from the script. What happens when you load index.html?
+     Can you explain why? put back type="text/babel" but remove the Babel JavaScript library.
+     What happens now?
+
+     A. Removing type='text/babel' causes unexpected token '<'.
+     Without this, the contents in the script is treated as regular javascript and
+     and JSX is not valid javscript, so syntax error.
+
+     A. Removing Babel Javascript Library causes the script to be ignored since the browser
+     will not recognize scripts of type 'text/babel'
+
+-->
+
+
+<!--
+     2. We used the minified version of Babel, but not for react and reactdoM.
+     Can you guess why? Switch to the production minified version and introduce a runtime
+     error in react (check out the unpkg.com website for the names of the production
+     versions of these libraries). For example, introduce a typo in the Id of the content
+     node so there is no place to mount the component. What happens?
+
+     A. react-dom.production.min.js:12 Uncaught Invariant Violation: Minified React error #200; 
+
+     minified not useful for dev. There is less information about errors on production minified
+     versions.
+-->

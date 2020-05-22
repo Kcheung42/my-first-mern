@@ -49,15 +49,37 @@ var IssueTable = /*#__PURE__*/function (_React$Component2) {
   var _super2 = _createSuper(IssueTable);
 
   function IssueTable() {
+    var _this;
+
     _classCallCheck(this, IssueTable);
 
-    return _super2.apply(this, arguments);
+    _this = _super2.call(this);
+    _this.state = {
+      issues: []
+    };
+    return _this;
   }
 
   _createClass(IssueTable, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.loadData();
+    }
+  }, {
+    key: "loadData",
+    value: function loadData() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.setState({
+          issues: initialIssues
+        });
+      }, 500); // 500 millisecond is reasonable to expect a real api call
+    }
+  }, {
     key: "render",
     value: function render() {
-      var issueRows = issues.map(function (issue) {
+      var issueRows = this.state.issues.map(function (issue) {
         return /*#__PURE__*/React.createElement(IssueRow, {
           key: issue.id,
           issue: issue
@@ -91,9 +113,9 @@ var IssueAdd = /*#__PURE__*/function (_React$Component3) {
   return IssueAdd;
 }(React.Component);
 
-var issues = [{
+var initialIssues = [{
   id: 1,
-  status: "New",
+  status: "new",
   owner: 'Kenny',
   effort: 5,
   created: new Date('2018-08-15'),
@@ -101,7 +123,7 @@ var issues = [{
   title: 'Error in console when clicking Add'
 }, {
   id: 2,
-  status: "New",
+  status: "old",
   owner: 'Kenny',
   effort: 1,
   created: new Date('2018-08-15'),
@@ -124,7 +146,25 @@ var IssueRow = /*#__PURE__*/function (_React$Component4) {
     key: "render",
     value: function render() {
       var issue = this.props.issue;
-      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.created.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.due ? issue.due.toDateString() : ' '), /*#__PURE__*/React.createElement("td", null, issue.title));
+
+      var get_color = function get_color(status) {
+        switch (status) {
+          case 'new':
+            return 'blue';
+
+          case 'old':
+            return 'red';
+
+          default:
+            return 'black';
+        }
+      };
+
+      return /*#__PURE__*/React.createElement("tr", {
+        style: {
+          color: get_color(issue.status)
+        }
+      }, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.created.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.due ? issue.due.toDateString() : ' '), /*#__PURE__*/React.createElement("td", null, issue.title));
     }
   }]);
 

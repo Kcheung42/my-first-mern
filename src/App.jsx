@@ -9,8 +9,23 @@ class IssueFilter extends React.Component{
 }
 
 class IssueTable extends React.Component{
+  constructor(){
+    super();
+    this.state = { issues: []};
+  }
+
+  componentDidMount(){
+    this.loadData();
+  }
+
+  loadData() {
+    setTimeout(() => {
+      this.setState({issues: initialIssues});
+    }, 500); // 500 millisecond is reasonable to expect a real api call
+  }
+
   render(){
-    const issueRows = issues.map(issue => <IssueRow key={issue.id} issue={issue} />);
+    const issueRows = this.state.issues.map(issue => <IssueRow key={issue.id} issue={issue} />);
     return (
       <table>
         <thead>
@@ -43,10 +58,10 @@ class IssueAdd extends React.Component{
 }
 
 
-const issues = [
+const initialIssues = [
   {
     id: 1,
-    status: "New",
+    status: "new",
     owner: 'Kenny',
     effort: 5,
     created: new Date('2018-08-15'),
@@ -55,7 +70,7 @@ const issues = [
   },
   {
     id: 2,
-    status: "New",
+    status: "old",
     owner: 'Kenny',
     effort: 1,
     created: new Date('2018-08-15'),
@@ -67,8 +82,19 @@ const issues = [
 class IssueRow extends React.Component {
   render(){
     const issue = this.props.issue;
+    const get_color = (status) => {
+      switch(status){
+      case 'new':
+        return 'blue';
+      case 'old':
+        return 'red';
+      default:
+        return 'black';
+      }
+    };
+
     return (
-      <tr>
+      <tr style={{color: get_color(issue.status)}}>
         <td>{issue.id}</td>
         <td>{issue.status}</td>
         <td>{issue.owner}</td>

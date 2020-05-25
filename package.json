@@ -4,7 +4,7 @@
   "description": "my first mern stack",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -w server server/server.js",
+    "start": "nodemon -w server -e js,graphql server/server.js",
     "compile": "babel src --out-dir public",
     "watch": "babel src --out-dir public --watch --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apollo-server-express": "^2.13.1",
     "express": "^4.17.1",
+    "graphql": "^14.6.0",
     "nodemon": "^1.19.4"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@ const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 
 let aboutMessage = "Issue Tracker API v1.0";
+const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 
 const issuesDB = [
   {
@@ -37,7 +38,10 @@ const GraphQLDate = new GraphQLScalarType({
     return new Date(value);
   },
   parseLiteral(ast) {
-    return (ast.kind == Kind.STRING) ? new Date(ast.value) : undefined;
+    if (ast.kind == Kind.STRING && dateRegex.test(ast.value)) {
+      return new Date(ast.value);
+    }
+    return undefined;
   },
 });
 

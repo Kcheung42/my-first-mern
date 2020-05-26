@@ -79,16 +79,18 @@ class IssueAdd extends React.Component{
       const form = document.forms.issueAdd;
       const issue = {
         owner: form.owner.value,
-        title: form.title.value
+        title: form.title.value,
+        due: new Date(new Date().getTime() + 1000*60*60*24*10),
       };
       this.props.createIssue(issue);
       form.owner.value = "";
       form.title.value = "";
     };
 
+
     return (
       <form name="issueAdd" onSubmit={handleSubmit}>
-        <input type="text" name="owner" placeholder="Owner"/>
+        <input type="text" name="owner" placeholder="Owners"/>
         <input type="text" name="title" placeholder="Title"/>
         <button>Add</button>
       </form>
@@ -124,20 +126,29 @@ class IssueList extends React.Component {
       body: JSON.stringify({ query }),
     });
 
-    // const resp = await response.json();
     const body = await response.text();
-    const result = JSON.parse(body, jsonDateReviver);
+    const result =  JSON.parse(body, jsonDateReviver);
     this.setState({ issues: result.data.issueList });
   }
 
   render() {
 
-    const createIssue = (issue)  =>{
-      issue.id = this.state.issues.length + 1;
-      issue.created = new Date();
-      const newIssuesList = this.state.issues.slice();
-      newIssuesList.push(issue);
-      this.setState({issues: newIssuesList});
+    const createIssue = async (issue) => {
+
+
+      const query = `mutation issueAdd ($issue: IssueInputs!){
+        issueAdd(issue: $issue) {
+          id
+        }
+      }`;
+
+      const response = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({query, variables: {issue}})
+      })
+      console.log(response)
+      this.loadData()
     };
 
     return (

@@ -110,7 +110,8 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
         var form = document.forms.issueAdd;
         var issue = {
           owner: form.owner.value,
-          title: form.title.value
+          title: form.title.value,
+          due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
         };
 
         _this.props.createIssue(issue);
@@ -125,7 +126,7 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
       }, /*#__PURE__*/React.createElement("input", {
         type: "text",
         name: "owner",
-        placeholder: "Owner"
+        placeholder: "Owners"
       }), /*#__PURE__*/React.createElement("input", {
         type: "text",
         name: "title",
@@ -211,18 +212,46 @@ var IssueList = /*#__PURE__*/function (_React$Component3) {
     value: function render() {
       var _this3 = this;
 
-      var createIssue = function createIssue(issue) {
-        issue.id = _this3.state.issues.length + 1;
-        issue.created = new Date();
+      var createIssue = /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(issue) {
+          var query, response;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  query = "mutation issueAdd ($issue: IssueInputs!){\n        issueAdd(issue: $issue) {\n          id\n        }\n      }";
+                  _context2.next = 3;
+                  return fetch('/graphql', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      query: query,
+                      variables: {
+                        issue: issue
+                      }
+                    })
+                  });
 
-        var newIssuesList = _this3.state.issues.slice();
+                case 3:
+                  response = _context2.sent;
+                  console.log(response);
 
-        newIssuesList.push(issue);
+                  _this3.loadData();
 
-        _this3.setState({
-          issues: newIssuesList
-        });
-      };
+                case 6:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2);
+        }));
+
+        return function createIssue(_x) {
+          return _ref.apply(this, arguments);
+        };
+      }();
 
       return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h1", null, "Issue Tracker"), /*#__PURE__*/React.createElement(IssueFilter, null), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueTable, {
         issues: this.state.issues

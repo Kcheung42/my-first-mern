@@ -1,24 +1,60 @@
 const fs = require('fs');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
+const { GraphQLScalarType } = require('graphql');
 
 let aboutMessage = "Issue Tracker API v1.0";
+
+const issuesDB = [
+  {
+    id: 1,
+    status: "new",
+    owner: "kenny",
+    effor: 5,
+    created: new Date('2020-01-01'),
+    due: new Date('2020-01-01'),
+    title: "Error Task 1"
+  },
+  {
+    id: 2,
+    status: "new",
+    owner: "Bob",
+    effor: 5,
+    created: new Date('2020-01-01'),
+    due: new Date('2020-01-01'),
+    title: "Error Task 2"
+  }
+];
+
+const GraphQLDate = new GraphQLScalarType({
+  name: "GraphQLDate",
+  description: 'A date type in Graphql as a scalar',
+  serialize(value) {
+    return value.toISOString();
+  }
+});
 
 
 const resolvers = {
   Query: {
     about: () => aboutMessage,
+    issueList,
   },
   Mutation: {
     setAboutMessage,
     // ES2015:Eequivalent to
     // setaboutMessage: setAboutMessage,
   },
+  GraphQLDate,
 };
 
 function setAboutMessage(_, {message}){
   return aboutMessage = message;
 };
+
+function issueList(){
+  return issuesDB;
+}
 
 const server = new ApolloServer({
   typeDefs: fs.readFileSync('./server/schema.graphql', 'utf-8'),

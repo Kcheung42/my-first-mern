@@ -59,10 +59,10 @@ var IssueRow = function IssueRow(props) {
 
   var get_color = function get_color(status) {
     switch (status) {
-      case 'new':
+      case 'New':
         return 'blue';
 
-      case 'old':
+      case 'Old':
         return 'red';
 
       default:
@@ -135,27 +135,7 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
   }]);
 
   return IssueAdd;
-}(React.Component); // const initialIssues = [
-//   {
-//     id: 1,
-//     status: "new",
-//     owner: 'Kenny',
-//     effort: 5,
-//     created: new Date('2018-08-15'),
-//     due: undefined,
-//     title : 'Error in console when clicking Add'
-//   },
-//   {
-//     id: 2,
-//     status: "old",
-//     owner: 'Kenny',
-//     effort: 1,
-//     created: new Date('2018-08-15'),
-//     due: undefined,
-//     title : 'Missing bottom border panel'
-//   }
-// ];
-
+}(React.Component);
 
 var IssueList = /*#__PURE__*/function (_React$Component3) {
   _inherits(IssueList, _React$Component3);

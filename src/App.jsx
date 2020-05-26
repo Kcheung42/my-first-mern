@@ -18,9 +18,9 @@ const IssueRow = (props) => {
   const issue = props.issue;
   const get_color = (status) => {
     switch(status){
-    case 'new':
+    case 'New':
       return 'blue';
-    case 'old':
+    case 'Old':
       return 'red';
     default:
       return 'black';
@@ -95,28 +95,6 @@ class IssueAdd extends React.Component{
     );
   }
 }
-
-
-// const initialIssues = [
-//   {
-//     id: 1,
-//     status: "new",
-//     owner: 'Kenny',
-//     effort: 5,
-//     created: new Date('2018-08-15'),
-//     due: undefined,
-//     title : 'Error in console when clicking Add'
-//   },
-//   {
-//     id: 2,
-//     status: "old",
-//     owner: 'Kenny',
-//     effort: 1,
-//     created: new Date('2018-08-15'),
-//     due: undefined,
-//     title : 'Missing bottom border panel'
-//   }
-// ];
 
 
 class IssueList extends React.Component {

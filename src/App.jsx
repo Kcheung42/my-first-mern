@@ -18,12 +18,12 @@ const IssueRow = (props) => {
   const issue = props.issue;
   const get_color = (status) => {
     switch(status){
-    case 'New':
-      return 'blue';
-    case 'Old':
-      return 'red';
-    default:
-      return 'black';
+      case 'New':
+        return 'blue';
+      case 'Old':
+        return 'red';
+      default:
+        return 'black';
     }
   };
 
@@ -70,10 +70,10 @@ class IssueAdd extends React.Component{
 
   constructor(){
     super();
+
   }
 
   render(){
-
     const handleSubmit = (e) => {
       e.preventDefault();
       const form = document.forms.issueAdd;
@@ -87,7 +87,6 @@ class IssueAdd extends React.Component{
       form.title.value = "";
     };
 
-
     return (
       <form name="issueAdd" onSubmit={handleSubmit}>
         <input type="text" name="owner" placeholder="Owners"/>
@@ -99,20 +98,43 @@ class IssueAdd extends React.Component{
 }
 
 
-class IssueList extends React.Component {
+async function graphQLFetch(query, variables = {}) {
+  try {
+    const response = await fetch('/graphql', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query , variables}),
+    })
+    const body = await response.text();
+    const result = JSON.parse(body, jsonDateReviver);
+    if (result.errors) {
+      const error = result.errors[0];
+      if (error.extensions.code == 'BAD_USER_INPUT') {
+        const details = errors.extensions.exceptions.errors.join('\n ');
+        alert(`${error.message}:\n ${details}`)
+      } else {
+        alert(`${error.extension.code}: ${error.message}`)
+      }
+    }
+    return result.data
+  } catch (e) {
+    alert(`Error in sending data to server: ${e.message}`);
+  }
+}
 
+
+class IssueList extends React.Component {
   constructor(){
     super();
     this.state = { issues: []};
+    this.createIssue = this.createIssue.bind(this);
   }
 
   componentDidMount(){
     this.loadData();
   };
 
-
   async loadData() {
-
     const query = `query{
       issueList{
         id title status owner
@@ -120,37 +142,28 @@ class IssueList extends React.Component {
       }
     }`;
 
-    const response = await fetch('/graphql', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ query }),
-    });
-
-    const body = await response.text();
-    const result =  JSON.parse(body, jsonDateReviver);
-    this.setState({ issues: result.data.issueList });
+    const data = await graphQLFetch(query);
+    if (data){
+      this.setState({ issues: data.issueList });
+    }
   }
 
-  render() {
-
-    const createIssue = async (issue) => {
-
-
-      const query = `mutation issueAdd ($issue: IssueInputs!){
+  async createIssue(issue) {
+    // Introducing graphql variables
+    // mutaiton <operation_name>(<variable>: <GraphqlType>)
+    const query = `mutation issueAdd ($issue: IssueInputs!){
         issueAdd(issue: $issue) {
           id
         }
       }`;
 
-      const response = await fetch('/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({query, variables: {issue}})
-      })
-      console.log(response)
+    const data = await graphQLFetch(query, { issue })
+    if (data) {
       this.loadData()
-    };
+    }
+  };
 
+  render() {
     return (
       <React.Fragment>
         <h1>Issue Tracker</h1>
@@ -158,7 +171,7 @@ class IssueList extends React.Component {
         <hr/>
         <IssueTable issues={this.state.issues}/>
         <hr/>
-        <IssueAdd createIssue={createIssue}/>
+        <IssueAdd createIssue={this.createIssue}/>
         <hr/>
       </React.Fragment>
     );

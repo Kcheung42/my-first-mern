@@ -1,6 +1,6 @@
 const fs = require('fs');
 const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer, UserInputError } = require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language');
 
@@ -35,11 +35,17 @@ const GraphQLDate = new GraphQLScalarType({
     return value.toISOString();
   },
   parseValue(value) {
-    return new Date(value);
+    // for when the dates come in through variables
+    // console.log("parseValue!");
+    const date = new Date(value);
+    return isNaN(date) ? undefined : date;
   },
   parseLiteral(ast) {
+    // for when the dates come in the query string
+    // console.log("parseLiteral!");
     if (ast.kind == Kind.STRING && dateRegex.test(ast.value)) {
-      return new Date(ast.value);
+      const date = new Date(ast.value);
+      return isNaN(date) ? undefined : date;
     }
     return undefined;
   },
@@ -53,23 +59,19 @@ const resolvers = {
   },
   Mutation: {
     setAboutMessage,
-    // ES2015:Eequivalent to
-    // setaboutMessage: setAboutMessage,
     issueAdd,
   },
   GraphQLDate,
 };
 
-function setAboutMessage(_, {message}){
+function setAboutMessage(_, { message }){
   return aboutMessage = message;
 };
 
 function issueAdd(_, { issue }) {
+  issueValidate(issue);
   issue.created = new Date();
   issue.id = issuesDB.length + 1;
-  if (issue.status == undefined) {
-    issue.status = "New";
-  }
   issuesDB.push(issue);
   return issue;
 }
@@ -78,9 +80,26 @@ function issueList(){
   return issuesDB;
 }
 
+function issueValidate(issue) {
+  const errors = [];
+  if (issue.title.length < 3) {
+    errors.push('Field "title" must be atleast 3 characters long');
+  }
+  if (issue.status == 'Assigned' && !issue.owner) {
+    errors.push('Field "owner" is required when status is "Assigned"');
+  }
+  if (errors.length > 0) {
+    throw new UserInputError('Invalid input(s)', { errors });
+  }
+}
+
 const server = new ApolloServer({
   typeDefs: fs.readFileSync('./server/schema.graphql', 'utf-8'),
   resolvers,
+  formatError: error => {
+    console.log(error);
+    return error;
+  },
 });
 
 // Middleware is a functin that takes in an http request and response
